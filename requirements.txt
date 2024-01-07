@@ -1,0 +1,2 @@
+undetected_chromedriver==3.2.1
+auto_download_undetected_chromedriver==0.16
