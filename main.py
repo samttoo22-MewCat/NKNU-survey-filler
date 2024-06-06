@@ -56,7 +56,15 @@ class NknuSurveyFiller():
         login_button = self.driver.find_element(By.XPATH, "//input[@id='uLoginPassAuthorizationCode']")
         login_button.click()
     
-    def fillSurvey(self):
+    def fill_student_survey(self):
+        self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/surveyIR.aspx") 
+        survey_buttons = self.driver.find_elements(By.XPATH, "//label[text()='非常同意']")
+        survey_submit = self.driver.find_element(By.XPATH, "//button[@class='btn btn-primary btn-lg']")
+        for button in survey_buttons:
+            button.click()
+        survey_submit.click()
+           
+    def fill_teacher_survey(self):
         self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/Default.aspx")
         begin_survey_button = self.driver.find_element(By.XPATH, "/html/body/form/div[4]/div/div/div/div[1]/div/div[2]/div/div/div/div/div/input")
         begin_survey_button.click()
@@ -80,4 +88,5 @@ class NknuSurveyFiller():
                    
 NknuSurveyFiller = NknuSurveyFiller()
 NknuSurveyFiller.login()
-NknuSurveyFiller.fillSurvey()
+NknuSurveyFiller.fill_student_survey()
+NknuSurveyFiller.fill_teacher_survey()
