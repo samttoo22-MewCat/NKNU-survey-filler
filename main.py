@@ -66,10 +66,11 @@ class NknuSurveyFiller():
            
     def fill_teacher_survey(self):
         self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/Default.aspx")
-        begin_survey_button = self.driver.find_element(By.XPATH, "/html/body/form/div[4]/div/div/div/div[1]/div/div[2]/div/div/div/div/div/input")
+        begin_survey_button = self.driver.find_element(By.XPATH, "//input[@value='開始填答']")
         begin_survey_button.click()
-        try:
-            while(EC.visibility_of_element_located((By.XPATH, "//a[text()='評量填寫']"))):
+        while(True):
+            try:
+                
                 survey_button = self.driver.find_element(By.XPATH, "//a[text()='評量填寫']")
 
                 self.driver.execute_script("arguments[0].click();", survey_button)
@@ -82,11 +83,17 @@ class NknuSurveyFiller():
                 alert = self.driver.switch_to.alert
                 alert.accept()
                 self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/survey.aspx")
-        except:
-            print("問卷填寫完成。")
+            except Exception as e:
+                print("問卷填寫完成。")
+                break
         
                    
 NknuSurveyFiller = NknuSurveyFiller()
 NknuSurveyFiller.login()
-NknuSurveyFiller.fill_student_survey()
+try:
+    NknuSurveyFiller.fill_student_survey()
+except:
+    print("學生問卷填寫失敗。")
+
 NknuSurveyFiller.fill_teacher_survey()
+
