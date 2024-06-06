@@ -16,7 +16,7 @@ class NknuSurveyFiller():
             options.add_argument("--disable-extensions")
             options.add_argument('--disable-application-cache')
             options.add_argument('--disable-gpu')
-            #options.add_argument('--headless') 
+            options.add_argument('--headless') 
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-notifications")
@@ -28,7 +28,7 @@ class NknuSurveyFiller():
             return options
         
         self.browser_executable_path = ""
-        download_undetected_chromedriver(self.browser_executable_path, undetected=True, arm=False, force_update=True, headless=True)
+        download_undetected_chromedriver(self.browser_executable_path, undetected=True, arm=False, force_update=True)
         self.browser_executable_path = os.path.abspath("chromedriver.exe")
         
         self.driver = uc.Chrome(options=get_ChromeOptions(), driver_executable_path=self.browser_executable_path, version_main=110)
