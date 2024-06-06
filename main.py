@@ -28,7 +28,7 @@ class NknuSurveyFiller():
             return options
         
         self.browser_executable_path = ""
-        download_undetected_chromedriver(self.browser_executable_path, undetected=True, arm=False, force_update=True)
+        download_undetected_chromedriver(self.browser_executable_path, undetected=True, arm=False, force_update=True, headless=True)
         self.browser_executable_path = os.path.abspath("chromedriver.exe")
         
         self.driver = uc.Chrome(options=get_ChromeOptions(), driver_executable_path=self.browser_executable_path, version_main=110)
