@@ -14,11 +14,11 @@
 * 直接執行
   * 打開你想要放爬蟲的地方 在終端輸入</br>
   `git clone https://github.com/samttoo22-MewCat/NKNU-survey-filler.git`</br>
+  或者你也可以去https://github.com/samttoo22-MewCat/NKNU-survey-filler/releases/tag/v0.0.1 下載 gui_main.zip 然後解壓縮</br>
   * 接著是安裝必要套件 同樣在終端輸入</br>
   `python -m pip install -r requirement.txt`</br>
   * 然後直接執行即可 在終端輸入</br>`python main.py`</br>
 * 使用GUI執行檔
-  * 打開你想要放爬蟲的地方 在終端輸入</br>
-  `git clone https://github.com/samttoo22-MewCat/NKNU-survey-filler.git`</br>
-  * 直接執行 gui_main.exe 就好
+  * 去https://github.com/samttoo22-MewCat/NKNU-survey-filler/releases/tag/v0.0.1 下載 gui_main.zip 然後解壓縮</br>
+  * 直接執行裡面 gui_main.exe 就好
 
