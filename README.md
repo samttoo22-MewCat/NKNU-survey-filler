@@ -11,7 +11,7 @@
 
 ## 安裝/使用教學
 
-* 直接執行(可能需要git)
+* 直接執行(可能需要git)</br>
   請先安裝python >= 3.9</br>
   * 打開你想要放爬蟲的地方 在終端輸入</br>
   `git clone https://github.com/samttoo22-MewCat/NKNU-survey-filler.git`</br>
