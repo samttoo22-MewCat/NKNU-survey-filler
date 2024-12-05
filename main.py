@@ -37,13 +37,13 @@ class NknuSurveyFiller():
         self.wait = WebDriverWait(self.driver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException])
 
         
-        self.account = "411077016"
-        self.password = "910925630608as"
+        self.account = ""
+        self.password = ""
         
         print("請輸入學號:")
-        #self.account = input()
+        self.account = input()
         print("請輸入密碼:")
-        #self.password = input()
+        self.password = input()
         
         
     def login(self):
@@ -115,13 +115,13 @@ class NknuSurveyFiller():
                    
 NknuSurveyFiller01 = NknuSurveyFiller()
 NknuSurveyFiller01.login()
-"""try:
+try:
     NknuSurveyFiller01.fill_student_survey()
 except Exception as e:
     print("學生問卷填寫失敗。")
     print(e)
     print(traceback.format_exc())
-    del NknuSurveyFiller01"""
+    del NknuSurveyFiller01
 
 try:
     NknuSurveyFiller01.fill_teacher_survey()
