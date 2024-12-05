@@ -1,13 +1,14 @@
 import os
-os.system('python -m pip install undetected_chromedriver')
-os.system('python -m pip install tk')
+import time
+import traceback
+#os.system('python -m pip install undetected_chromedriver')
+#os.system('python -m pip install tk')
 try:
     
     import sys
     from time import sleep
-    import undetected_chromedriver as uc
     from selenium.webdriver.common.by import By
-    
+    from seleniumbase import Driver
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import *
@@ -17,7 +18,9 @@ try:
     import threading
     
     
-except:
+except Exception as e:
+    print(e)
+    print(traceback.format_exc())
     input("初始化程式中發生錯誤，請按 Enter 關閉程式")
     sys.exit()
 sys.stderr = open('error_log.txt', 'w')
@@ -42,7 +45,10 @@ class NknuSurveyFiller():
             return options
         signal.signal(signal.SIGINT, self.signal_handler)
         self.browser_executable_path = os.path.abspath("chromedriver.exe")
-        self.driver = uc.Chrome(options=get_ChromeOptions(), driver_executable_path=self.browser_executable_path, version_main=110)
+        self.driver = Driver(headless=True, disable_gpu=True,
+                no_sandbox=True, agent='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36',
+                uc=True, chromium_arg="--disable-extensions"
+                )
         self.wait = WebDriverWait(self.driver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException])
         
         self.root = tk.Tk()
@@ -80,8 +86,6 @@ class NknuSurveyFiller():
         self.driver.quit()
         sys.exit(0)
 
-
-        
         
     def start(self):
         print("開始填寫...")
@@ -97,9 +101,7 @@ class NknuSurveyFiller():
             self.fill_teacher_survey()
         
         threading.Thread(target=_start).start()
-        
-
-        
+             
     def update_progress(self, text, value, survey_text=""):
         self.root.after(0, self.progress_label.config, {"text": text})
         self.root.after(0, self.progress_bar.config, {"value": value})
@@ -120,7 +122,6 @@ class NknuSurveyFiller():
         login_button.click()
         
         
-        
         try:
             self.wait.until(EC.alert_is_present())
             self.update_progress("登入失敗，請確認學號及密碼是否正確", 10)
@@ -133,22 +134,45 @@ class NknuSurveyFiller():
         self.update_progress("正在填寫學生問卷...", 30, "學生問卷")
         print("正在填寫學生問卷...")
         self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/surveyIR.aspx") 
+        try:
+            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[text()='下次再填']")
+            pop_up_cancel_button.click()
+        except:
+            pass
+
+        try:
+            pop_up_enter_button = self.driver.find_element(By.XPATH, "//input[@value='進入']")
+            pop_up_enter_button.click()
+        except:
+            pass
+
         survey_buttons = self.driver.find_elements(By.XPATH, "//label[text()='非常同意']")
         survey_submit = self.driver.find_element(By.XPATH, "//button[@class='btn btn-primary btn-lg']")
         for button in survey_buttons:
             button.click()
         survey_submit.click()
+        try:
+            pop_up_enter_button = self.driver.find_element(By.XPATH, "//button[text()='確 定']")
+            pop_up_enter_button.click()
+        except:
+            pass
         self.update_progress("學生問卷填寫完成", 60, "")
         print("學生問卷填寫完成")
            
     def fill_teacher_survey(self):
-        self.update_progress("正在填寫教師問卷...", 70, "教師問卷")
-        print("正在填寫教師問卷...")
         self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/Default.aspx")
+        try:
+            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[text()='下次再填']")
+            pop_up_cancel_button.click()
+            time.sleep(0.5)
+        except:
+            pass
         begin_survey_button = self.driver.find_element(By.XPATH, "//input[@value='開始填答']")
         begin_survey_button.click()
+        
         while(True):
             try:
+                
                 survey_button = self.driver.find_element(By.XPATH, "//a[text()='評量填寫']")
 
                 self.driver.execute_script("arguments[0].click();", survey_button)
@@ -162,10 +186,9 @@ class NknuSurveyFiller():
                 alert.accept()
                 self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/survey.aspx")
             except Exception as e:
-                self.update_progress("教師問卷填寫完成", 100, "")
-                self.update_progress("問卷填寫完成。", 100, "")
                 print("問卷填寫完成。")
-                sys.exit()
+                break
       
 
 NknuSurveyFiller01 = NknuSurveyFiller()
+del NknuSurveyFiller01
