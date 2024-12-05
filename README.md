@@ -20,7 +20,7 @@
   `python -m pip install -r requirement.txt`</br>
   * 然後直接執行即可 在終端輸入</br>`python gui_main.py`</br>
 * 使用GUI執行檔
-  * 去[這邊](https://drive.google.com/file/d/1oBMW-yfHONkq24HkmK0nTHLwQqMq4Oud/view?usp=sharing) 下載然後解壓縮</br>
+  * 去[這邊](https://drive.google.com/file/d/1oBMW-yfHONkq24HkmK0nTHLwQqMq4Oud/view?usp=sharing) （release那邊已經過時了 別下載那邊）下載然後解壓縮</br>
   * 直接執行裡面 gui_main.exe 就好</br>
     (看到終端在跑東西是正常ㄉ)
 
