@@ -11,12 +11,11 @@
 * 2024/12/05 例行更新
 
 ## 安裝/使用教學
-
+建議沒有python程式基礎的人使用GUI執行檔
 * 直接執行(可能需要git)</br>
   請先安裝python >= 3.9</br>
   * 打開你想要放爬蟲的地方 在終端輸入</br>
   `git clone https://github.com/samttoo22-MewCat/NKNU-survey-filler.git`</br>
-  或者你也可以去https://github.com/samttoo22-MewCat/NKNU-survey-filler/releases/tag/v0.0.1 下載 gui_main.zip 然後解壓縮</br>
   * 接著是安裝必要套件 同樣在終端輸入</br>
   `python -m pip install -r requirement.txt`</br>
   * 然後直接執行即可 在終端輸入</br>`python gui_main.py`</br>
