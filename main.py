@@ -1,17 +1,19 @@
 from time import sleep
-import undetected_chromedriver as uc
+import time
+import traceback
 from selenium.webdriver.common.by import By
-import auto_download_undetected_chromedriver
-from auto_download_undetected_chromedriver import download_undetected_chromedriver
 import os
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import *
+import seleniumbase
+from seleniumbase import Driver
+from selenium.webdriver.chrome.options import Options
 
 class NknuSurveyFiller():
     def __init__(self):
         def get_ChromeOptions(): 
-            options = uc.ChromeOptions()
+            options = Options()
             options.add_argument('--start_maximized')
             options.add_argument("--disable-extensions")
             options.add_argument('--disable-application-cache')
@@ -27,22 +29,21 @@ class NknuSurveyFiller():
             options.add_argument("--user-data-dir={}".format(os.path.abspath("profile1")))
             return options
         
-        self.browser_executable_path = ""
-        download_undetected_chromedriver(self.browser_executable_path, undetected=True, arm=False, force_update=True)
-        self.browser_executable_path = os.path.abspath("chromedriver.exe")
-        
-        self.driver = uc.Chrome(options=get_ChromeOptions(), driver_executable_path=self.browser_executable_path, version_main=110)
+        self.driver = Driver(headless=False, disable_gpu=True,
+                no_sandbox=True, agent='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36',
+                uc=True, chromium_arg="--disable-extensions"
+                )
         self.driver.get("https://sso.nknu.edu.tw/")
         self.wait = WebDriverWait(self.driver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException])
 
         
-        self.account = ""
-        self.password = ""
+        self.account = "411077016"
+        self.password = "910925630608as"
         
         print("請輸入學號:")
-        self.account = input()
+        #self.account = input()
         print("請輸入密碼:")
-        self.password = input()
+        #self.password = input()
         
         
     def login(self):
@@ -58,16 +59,40 @@ class NknuSurveyFiller():
     
     def fill_student_survey(self):
         self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/surveyIR.aspx") 
+        try:
+            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[text()='下次再填']")
+            pop_up_cancel_button.click()
+        except:
+            pass
+
+        try:
+            pop_up_enter_button = self.driver.find_element(By.XPATH, "//input[@value='進入']")
+            pop_up_enter_button.click()
+        except:
+            pass
+
         survey_buttons = self.driver.find_elements(By.XPATH, "//label[text()='非常同意']")
         survey_submit = self.driver.find_element(By.XPATH, "//button[@class='btn btn-primary btn-lg']")
         for button in survey_buttons:
             button.click()
         survey_submit.click()
+        try:
+            pop_up_enter_button = self.driver.find_element(By.XPATH, "//button[text()='確 定']")
+            pop_up_enter_button.click()
+        except:
+            pass
            
     def fill_teacher_survey(self):
         self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/Default.aspx")
+        try:
+            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[text()='下次再填']")
+            pop_up_cancel_button.click()
+            time.sleep(0.5)
+        except:
+            pass
         begin_survey_button = self.driver.find_element(By.XPATH, "//input[@value='開始填答']")
         begin_survey_button.click()
+        
         while(True):
             try:
                 
@@ -88,11 +113,23 @@ class NknuSurveyFiller():
                 break
         
                    
-NknuSurveyFiller = NknuSurveyFiller()
-NknuSurveyFiller.login()
-try:
-    NknuSurveyFiller.fill_student_survey()
-except:
+NknuSurveyFiller01 = NknuSurveyFiller()
+NknuSurveyFiller01.login()
+"""try:
+    NknuSurveyFiller01.fill_student_survey()
+except Exception as e:
     print("學生問卷填寫失敗。")
+    print(e)
+    print(traceback.format_exc())
+    del NknuSurveyFiller01"""
 
-NknuSurveyFiller.fill_teacher_survey()
+try:
+    NknuSurveyFiller01.fill_teacher_survey()
+except Exception as e:
+    print("教師問卷填寫失敗。")
+    print(e)
+    print(traceback.format_exc())
+    del NknuSurveyFiller01
+
+
+del NknuSurveyFiller01
