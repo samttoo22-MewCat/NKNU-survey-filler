@@ -1,13 +1,12 @@
 import os
-os.system('python -m pip install undetected_chromedriver')
-os.system('python -m pip install tk')
+
 try:
     
     import sys
     from time import sleep
-    import undetected_chromedriver as uc
+    from seleniumbase import Driver
     from selenium.webdriver.common.by import By
-    
+    from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import *
@@ -15,7 +14,7 @@ try:
     from tkinter import ttk
     import signal
     import threading
-    
+    import ddddocr
     
 except:
     input("初始化程式中發生錯誤，請按 Enter 關閉程式")
@@ -25,7 +24,7 @@ sys.stderr = open('error_log.txt', 'w')
 class NknuSurveyFiller():
     def __init__(self):
         def get_ChromeOptions(): 
-            options = uc.ChromeOptions()
+            options = Options()
             options.add_argument('--start_maximized')
             options.add_argument("--disable-extensions")
             options.add_argument('--disable-application-cache')
@@ -42,7 +41,11 @@ class NknuSurveyFiller():
             return options
         signal.signal(signal.SIGINT, self.signal_handler)
         self.browser_executable_path = os.path.abspath("chromedriver.exe")
-        self.driver = uc.Chrome(options=get_ChromeOptions(), driver_executable_path=self.browser_executable_path, version_main=110)
+        self.driver = Driver(headless=False, disable_gpu=True,
+                no_sandbox=True, agent='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36',
+                uc=True, chromium_arg="--disable-extensions"
+                )
+        
         self.wait = WebDriverWait(self.driver, 10, poll_frequency=1, ignored_exceptions=[ElementNotVisibleException, ElementNotSelectableException])
         
         self.root = tk.Tk()
@@ -71,6 +74,8 @@ class NknuSurveyFiller():
         
         self.account = ""
         self.password = ""
+        self.ocr = ddddocr.DdddOcr()
+        self.ocr.set_ranges(0)
         
         self.root.mainloop()
         self.driver.quit()
@@ -80,9 +85,7 @@ class NknuSurveyFiller():
         self.driver.quit()
         sys.exit(0)
 
-
-        
-        
+     
     def start(self):
         print("開始填寫...")
         self.update_progress("開始填寫...", 5)
@@ -91,15 +94,14 @@ class NknuSurveyFiller():
             self.account = self.account_entry.get()
             self.password = self.password_entry.get()
             
+            self.fill_verification_code()
             self.login()
             
             self.fill_student_survey()
             self.fill_teacher_survey()
         
         threading.Thread(target=_start).start()
-        
-
-        
+              
     def update_progress(self, text, value, survey_text=""):
         self.root.after(0, self.progress_label.config, {"text": text})
         self.root.after(0, self.progress_bar.config, {"value": value})
@@ -117,9 +119,10 @@ class NknuSurveyFiller():
         account_block.send_keys(self.account)
         password_block.send_keys(self.password)
         login_button = self.driver.find_element(By.XPATH, "//input[@id='uLoginPassAuthorizationCode']")
+        login_button2 = self.driver.find_element(By.XPATH, "//input[@id='uLogin']")
+        login_button2.click()
         login_button.click()
-        
-        
+
         
         try:
             self.wait.until(EC.alert_is_present())
@@ -129,17 +132,55 @@ class NknuSurveyFiller():
             self.update_progress("登入成功", 20)
             print("登入成功")
     
+    def fill_verification_code(self):
+        verification_code_img = self.driver.find_element(By.XPATH, "//div[@class='form-inline']")
+        verification_code_img = verification_code_img.find_element(By.TAG_NAME, "img")
+
+        # 確定圖片儲存的路徑
+        save_path = 'verification_code.png'  # 可以根據需要修改檔案名稱和路徑
+
+        # 下載圖片
+        verification_code_img.screenshot(save_path)
+        
+        print(f"驗證碼圖片已成功儲存為 {save_path}")
+
+        image = open(f"{save_path}", "rb").read()
+        result = self.ocr.classification(image)
+        print(f"驗證碼為: {result}")
+
+        verification_code_input = self.driver.find_element(By.XPATH, "//div[@class='form-inline']/input")
+        verification_code_input.send_keys(result)
+
     def fill_student_survey(self):
         self.update_progress("正在填寫學生問卷...", 30, "學生問卷")
         print("正在填寫學生問卷...")
         self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/surveyIR.aspx") 
+
+        try:
+            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[text()='下次再填']")
+            pop_up_cancel_button.click()
+        except:
+            pass
+
+        try:
+            pop_up_enter_button = self.driver.find_element(By.XPATH, "//input[@value='進入']")
+            pop_up_enter_button.click()
+        except:
+            pass
+
         survey_buttons = self.driver.find_elements(By.XPATH, "//label[text()='非常同意']")
         survey_submit = self.driver.find_element(By.XPATH, "//button[@class='btn btn-primary btn-lg']")
         for button in survey_buttons:
             button.click()
         survey_submit.click()
+        try:
+            pop_up_enter_button = self.driver.find_element(By.XPATH, "//button[text()='確 定']")
+            pop_up_enter_button.click()
+        except:
+            pass
         self.update_progress("學生問卷填寫完成", 60, "")
         print("學生問卷填寫完成")
+
            
     def fill_teacher_survey(self):
         self.update_progress("正在填寫教師問卷...", 70, "教師問卷")
