@@ -8,6 +8,7 @@
 **使用這個程式 他會要求你的學號和密碼 不會儲存起來 不相信可以自己看程式**</br></br>
 * 2024/06/06 更新新的問卷</br>
 * 2024/06/07 新增附帶GUI的執行檔</br>
+* 2024/12/21 新增驗證碼辨識功能
 
 ## 安裝/使用教學
 
@@ -20,7 +21,7 @@
   `python -m pip install -r requirement.txt`</br>
   * 然後直接執行即可 在終端輸入</br>`python gui_main.py`</br>
 * 使用GUI執行檔
-  * 去https://github.com/samttoo22-MewCat/NKNU-survey-filler/releases/tag/v0.0.1 下載 gui_main.zip 然後解壓縮</br>
+  * 去[這裡](https://drive.google.com/file/d/1Na-sVG_h_6FIsR0QQgWaB4GakllrCiFg/view?usp=sharing)下載 gui_main.zip 然後解壓縮</br>
   * 直接執行裡面 gui_main.exe 就好</br>
     (看到終端在跑東西是正常ㄉ)
 
