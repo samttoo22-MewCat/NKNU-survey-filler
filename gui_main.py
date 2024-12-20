@@ -1,4 +1,5 @@
 import os
+import traceback
 
 try:
     
@@ -119,18 +120,25 @@ class NknuSurveyFiller():
         account_block.send_keys(self.account)
         password_block.send_keys(self.password)
         login_button = self.driver.find_element(By.XPATH, "//input[@id='uLoginPassAuthorizationCode']")
-        login_button2 = self.driver.find_element(By.XPATH, "//input[@id='uLogin']")
-        login_button2.click()
+        login_button_with_auth = self.driver.find_element(By.XPATH, "//input[@id='uLogin']")
+        login_button_with_auth.click()
         login_button.click()
 
         
         try:
-            self.wait.until(EC.alert_is_present())
-            self.update_progress("登入失敗，請確認學號及密碼是否正確", 10)
-            sys.exit(0)
-        except TimeoutException:
+            #self.wait.until(EC.alert_is_present())
+
+            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[@id='ctl00_ctl26_btQuestionnaire_Skip']")
+            pop_up_cancel_button.click()
             self.update_progress("登入成功", 20)
             print("登入成功")
+    
+        except Exception as e:
+            print(e)   
+            print(traceback.format_exc())
+            
+            self.update_progress("登入失敗，請確認學號及密碼是否正確", 10)
+            sys.exit(0)
     
     def fill_verification_code(self):
         verification_code_img = self.driver.find_element(By.XPATH, "//div[@class='form-inline']")
