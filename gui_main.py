@@ -130,9 +130,7 @@ class NknuSurveyFiller():
         
         try:
             #self.wait.until(EC.alert_is_present())
-            self.wait.until(EC.visibility_of_element_located((By.XPATH, "//button[@id='ctl00_ctl26_btQuestionnaire_Skip']")))
-            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[@id='ctl00_ctl26_btQuestionnaire_Skip']")
-            pop_up_cancel_button.click()
+            self.wait.until(EC.visibility_of_element_located((By.XPATH, "//div[@class='ui-widget-div']")))
             self.update_progress("登入成功", 20)
             print("登入成功")
     
@@ -142,25 +140,39 @@ class NknuSurveyFiller():
             
             self.update_progress("登入失敗，請確認學號及密碼是否正確", 10)
             sys.exit(0)
+
+        try:
+            pop_up_cancel_button = self.driver.find_element(By.XPATH, "//button[@id='ctl00_ctl26_btQuestionnaire_Skip']")
+            pop_up_cancel_button.click()
+        except:
+            pass
     
     def fill_verification_code(self):
-        verification_code_img = self.driver.find_element(By.XPATH, "//div[@class='form-inline']")
-        verification_code_img = verification_code_img.find_element(By.TAG_NAME, "img")
+        time.sleep(0.3)
+        try:
+            verification_code_img = self.driver.find_element(By.XPATH, "//div[@class='form-inline']")
+            verification_code_img = verification_code_img.find_element(By.TAG_NAME, "img")
 
-        # 確定圖片儲存的路徑
-        save_path = 'verification_code.png'  # 可以根據需要修改檔案名稱和路徑
+            # 確定圖片儲存的路徑
+            save_path = 'verification_code.png'  # 可以根據需要修改檔案名稱和路徑
 
-        # 下載圖片
-        verification_code_img.screenshot(save_path)
-        
-        print(f"驗證碼圖片已成功儲存為 {save_path}")
+            # 下載圖片
+            verification_code_img.screenshot(save_path)
+            
+            print(f"驗證碼圖片已成功儲存為 {save_path}")
 
-        image = open(f"{save_path}", "rb").read()
-        result = self.ocr.classification(image)
-        print(f"驗證碼為: {result}")
+            image = open(f"{save_path}", "rb").read()
+            result = self.ocr.classification(image)
+            print(f"驗證碼為: {result}")
 
-        verification_code_input = self.driver.find_element(By.XPATH, "//div[@class='form-inline']/input")
-        verification_code_input.send_keys(result)
+            verification_code_input = self.driver.find_element(By.XPATH, "//div[@class='form-inline']/input")
+            verification_code_input.send_keys(result)
+        except NoSuchElementException:
+            print("未偵測到驗證碼圖片，跳過驗證碼填寫步驟")
+            return 0
+        except Exception as e:
+            print(f"處理驗證碼時發生錯誤: {str(e)}")
+            return 0
 
     def fill_student_survey(self):
         self.update_progress("正在填寫學生問卷...", 30, "學生問卷")
@@ -201,11 +213,22 @@ class NknuSurveyFiller():
         begin_survey_button.click()
         while(True):
             try:
-                survey_button = self.driver.find_element(By.XPATH, "//a[text()='評量填寫']")
+                #self.wait.until(EC.presence_of_element_located((By.XPATH, "//div[@class='ctl00_phMain_UpdatePanel1']")))
+                #panel = self.driver.find_element(By.XPATH, "//div[@class='ctl00_phMain_UpdatePanel1']")
+                #print(panel.get_attribute("innerHTML"))
+                print(self.driver.page_source)
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'btn-warning') and contains(text(), '評量填寫')]")))
+                survey_button = self.driver.find_element(By.XPATH, "//a[contains(@class, 'btn-warning') and contains(text(), '評量填寫')]")
 
                 self.driver.execute_script("arguments[0].click();", survey_button)
+                time.sleep(0.1)
                 self.wait.until(EC.visibility_of_element_located((By.XPATH, "//input[@value='5']")))
                 five_stars = self.driver.find_elements(By.XPATH, "//input[@value='5']") 
+                
+                # 滾動到頁面底部
+                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(0.1)
+                
                 for f in five_stars:
                     f.click()
                 submit_button = self.driver.find_element(By.XPATH, "//input[@value='填好送出']")
@@ -214,6 +237,8 @@ class NknuSurveyFiller():
                 alert.accept()
                 self.driver.get("https://sso.nknu.edu.tw/StudentProfile/Survey/survey.aspx")
             except Exception as e:
+                print(e)
+                print(traceback.format_exc())
                 self.update_progress("教師問卷填寫完成", 100, "")
                 self.update_progress("問卷填寫完成。", 100, "")
                 print("問卷填寫完成。")
